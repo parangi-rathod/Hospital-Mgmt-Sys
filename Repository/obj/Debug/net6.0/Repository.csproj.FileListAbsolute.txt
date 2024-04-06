@@ -1,0 +1,14 @@
+E:\HospitalMgmtSys\Repository\bin\Debug\net6.0\Repository.deps.json
+E:\HospitalMgmtSys\Repository\bin\Debug\net6.0\Repository.runtimeconfig.json
+E:\HospitalMgmtSys\Repository\bin\Debug\net6.0\Repository.dll
+E:\HospitalMgmtSys\Repository\bin\Debug\net6.0\Repository.pdb
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\Repository.csproj.AssemblyReference.cache
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\Repository.GeneratedMSBuildEditorConfig.editorconfig
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\Repository.AssemblyInfoInputs.cache
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\Repository.AssemblyInfo.cs
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\Repository.csproj.CoreCompileInputs.cache
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\Repository.dll
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\refint\Repository.dll
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\Repository.pdb
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\Repository.genruntimeconfig.cache
+E:\HospitalMgmtSys\Repository\obj\Debug\net6.0\ref\Repository.dll
