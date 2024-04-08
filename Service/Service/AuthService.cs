@@ -12,7 +12,7 @@ namespace Service.Service
         #region properties
         private readonly IAuthRepo _authRepo;
         private readonly IMapper _mapper;
-        //private readonly IEmailService _emailService;
+        private readonly IEmailService _emailService;
         private readonly IUserRepo _userRepo;
         private readonly IJWTTokenService _jwtToken;
         private readonly IPasswordHash _passwordHash;
@@ -21,11 +21,11 @@ namespace Service.Service
         #endregion
 
         #region ctor
-        public AuthService(IAuthRepo authRepo,  IMapper mapper, IJWTTokenService jwtToken, /*IEmailService emailService*/ IUserRepo userRepo, IPasswordHash passwordHash, IValidationService validationService)
+        public AuthService(IAuthRepo authRepo,  IMapper mapper, IJWTTokenService jwtToken, IEmailService emailService, IUserRepo userRepo, IPasswordHash passwordHash, IValidationService validationService)
         {
             _authRepo = authRepo;
             _mapper = mapper;
-            //_emailService = emailService;
+            _emailService = emailService;
             _userRepo = userRepo;
             _jwtToken = jwtToken;
             _passwordHash = passwordHash;
@@ -38,9 +38,8 @@ namespace Service.Service
         public async Task<ResponseDTO> RegisterUser(RegisterUserDTO registerUserDTO)
         {
             try
-            {
-               
-                var validationResult = await _validationService.ValidateRegister(registerUserDTO);
+            {               
+                var validationResult = await _validationService.ValidateUser(registerUserDTO);
 
                 if (validationResult.IsValid)
                 {
@@ -51,22 +50,32 @@ namespace Service.Service
                     if(registerUserDTO.Role.Equals(RoleType.Nurse))
                     {
                         var nurseCount = await _userRepo.NurseCount(); 
-                        if (nurseCount == 10)
+                        if (nurseCount >= 10)
                         {
                             return new ResponseDTO { Status = 400, Message = "System already contains 10 nurses." };
                         }
                     }
                     if(registerUserDTO.Role.Equals(RoleType.Receptionist))
                     {
-                        var nurseCount = await _userRepo.ReceptionistCount(); 
-                        if (nurseCount == 2)
+                        var receptionistCount = await _userRepo.ReceptionistCount(); 
+                        if (receptionistCount >= 2)
                         {
                             return new ResponseDTO { Status = 400, Message = "System already contains 2 receptionist." };
                         }
                     }
 
                     var reg = await _authRepo.Register(user);
-                    
+                    string Fullname = registerUserDTO.FirstName + " " + registerUserDTO.LastName;
+                    var emailDTO = new EmailDTO
+                    {
+                        Email = registerUserDTO.Email, // Ensuring Email is not null
+                        Name = Fullname, // Ensuring Fullname is not null
+                        Subject = "Successfully Registered",
+                        Body = "Welcome to Sterling Hospitals! You have successfully registered as " + user.Role
+                                + ". \nYou can Login into system using " + (registerUserDTO.Password ?? "") // Ensuring Password is not null
+                    };
+
+                    _emailService.SendEmail(emailDTO);
                     return new ResponseDTO { Status = 200, Message = "User registered successfully." };
                 }
 
@@ -87,13 +96,13 @@ namespace Service.Service
         {
             try
             {
-                var doctorCount = await _userRepo.DoctorCount(); // Await the asynchronous method
-                if (doctorCount == 3)
+                var doctorCount = await _userRepo.DoctorCount(); 
+                if (doctorCount >= 3)
                 {
                     return new ResponseDTO { Status = 400, Message = "System already contains 3 doctors." };
                 }
 
-                var validationResult = await _validationService.ValidateRegister(registerDoctorDTO);
+                var validationResult = await _validationService.ValidateDoctor(registerDoctorDTO);
 
                 if (!validationResult.IsValid)
                 {
@@ -108,11 +117,11 @@ namespace Service.Service
                 }
 
                 string passHash = _passwordHash.GeneratePasswordHash(registerDoctorDTO.Password);
+                
                 var user = _mapper.Map<Users>(registerDoctorDTO);
                 user.Password = passHash;
                 
                 var reg = await _authRepo.Register(user);
-
                 
                 var specialization = registerDoctorDTO.Specialization;
                 if (specialization != null)
@@ -126,8 +135,17 @@ namespace Service.Service
 
                     await _authRepo.SpecialistDoctorReg(specializationEntity);
                 }
-
-                return new ResponseDTO { Status = 200, Message = "User and specialization registered successfully." };
+                string Fullname = registerDoctorDTO.FirstName + " " + registerDoctorDTO.LastName;
+                var emailDTO = new EmailDTO
+                {
+                    Email = registerDoctorDTO.Email,
+                    Name = Fullname,
+                    Subject = "Successfully Registered",
+                    Body = "Welcome to Sterling Hospitals! You have successfully registered as " + user.Role
+                                    + ". \nYou can Login into system using " + registerDoctorDTO.Password
+                };
+                _emailService.SendEmail(emailDTO);
+                return new ResponseDTO { Status = 200, Message = "Doctor with specialization registered successfully." };
             }
             catch (Exception ex)
             {

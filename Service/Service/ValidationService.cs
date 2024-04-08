@@ -8,104 +8,73 @@ namespace Service.Service
 {
     public class ValidationService : IValidationService
     {
-        public async Task<ValidationDTO> ValidateRegister(RegisterUserDTO registerDTO)
+        public async Task<ValidationDTO> ValidateUser(RegisterUserDTO registerDTO)
         {
-            ValidationDTO response = new ValidationDTO();
-            response.Status = 200;
-            response.Message = "Validation successful.";
+            var validationRules = new Dictionary<Func<RegisterUserDTO, bool>, string>
+            {
+                { dto => !string.IsNullOrWhiteSpace(dto.FirstName), "Firstname is required." },
+                { dto => !string.IsNullOrWhiteSpace(dto.LastName), "Lastname is required." },
+                { dto => !string.IsNullOrWhiteSpace(dto.Email) && IsValidEmail(dto.Email), "Invalid email format." },
+                { dto => string.IsNullOrWhiteSpace(dto.ContactNum) || IsValidPhoneNumber(dto.ContactNum), "Invalid contact format."},
+                { dto => !string.IsNullOrWhiteSpace(dto.Address), "Invalid address"},
+                { dto => !string.IsNullOrWhiteSpace(dto.Gender) && ValidGender(dto.Gender), "Gender must be male, female or other"},
+                { dto => string.IsNullOrWhiteSpace(dto.Pincode) || Regex.IsMatch(dto.Pincode, @"^\d{6}$"), "Pincode must be lenght of 6 numbers"},
+                {dto => ValidateRole(dto.Role),"Role must be Nurse or Receptionist" }
+            };
 
-            List<string> errors = new List<string>();
+            return await ValidateDTO(registerDTO, validationRules);
+        }
+        public async Task<ValidationDTO> ValidatePatient(RegisterPatientDTO registerDTO)
+        {
+            var validationRules = new Dictionary<Func<RegisterPatientDTO, bool>, string>
+            {
+                { dto => !string.IsNullOrWhiteSpace(dto.FirstName), "Firstname is required." },
+                { dto => !string.IsNullOrWhiteSpace(dto.LastName), "Lastname is required." },
+                { dto => !string.IsNullOrWhiteSpace(dto.Email) && IsValidEmail(dto.Email), "Invalid email format." },
+                { dto => string.IsNullOrWhiteSpace(dto.ContactNum) || IsValidPhoneNumber(dto.ContactNum), "Invalid contact format."},
+                { dto => !string.IsNullOrWhiteSpace(dto.Address), "Invalid address"},
+                { dto => !string.IsNullOrWhiteSpace(dto.Gender) && ValidGender(dto.Gender), "Gender must be male, female or other"},
+                { dto => string.IsNullOrWhiteSpace(dto.Pincode) || Regex.IsMatch(dto.Pincode, @"^\d{6}$"), "Pincode must be length of 6 numbers"},
+            };
 
-            if (string.IsNullOrWhiteSpace(registerDTO.FirstName))
-            {
-                errors.Add("Firstname is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(registerDTO.LastName))
-            {
-                errors.Add("Lastname is required.");
-            }
-            if (string.IsNullOrWhiteSpace(registerDTO.Email))
-            {
-                errors.Add("Email is required.");
-            }
-            else if (!IsValidEmail(registerDTO.Email))
-            {
-                errors.Add("Invalid email format.");
-            }
-            if (!string.IsNullOrWhiteSpace(registerDTO.ContactNum) && !IsValidPhoneNumber(registerDTO.ContactNum))
-            {
-                errors.Add("Invalid contact number format.");
-            }
-            if (string.IsNullOrWhiteSpace(registerDTO.Address))
-            {
-                errors.Add("Address is required.");
-            }
-            if (string.IsNullOrWhiteSpace(registerDTO.Gender))
-            {
-                errors.Add("Gender is required.");
-            }
-            if (!ValidGender(registerDTO.Gender))
-            {
-                errors.Add("Enter valid gender.");
-            }
-            if (string.IsNullOrWhiteSpace(registerDTO.Pincode))
-            {
-                errors.Add("Pincode is required.");
-            }
-            if (!Regex.IsMatch(registerDTO.Pincode, @"^\d{6}$"))
-            {
-                errors.Add("Pincode must be a 6-digit number.");
-            }
-            if (!ValidateRole(registerDTO.Role))
-            {
-                errors.Add("Role must be either of Doctor, nurse, receptionist or Patient");
-            }
-
-            bool ValidGender(string gender)
-            {
-                // Check if the gender is one of the accepted values
-                if (gender != "Female" && gender != "Male" && gender != "Other")
-                {
-                    return false; // If the gender is not one of the accepted values, return false
-                }
-                return true; // Otherwise, return true
-            }
-
-
-            bool IsValidEmail(string email)
-            {
-                try
-                {
-                    var addr = new System.Net.Mail.MailAddress(email);
-                    return addr.Address == email;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-            bool IsValidPhoneNumber(string phoneNumber)
-            {
-                return Regex.Match(phoneNumber, @"^\d{10}$").Success;
-            }
-
-            bool ValidateRole(string role)
-            {
-               return Enum.IsDefined(typeof(RoleType), role);
-            }
-
-
-            if (errors.Any())
-            {
-                response.Status = 400;
-                response.Message = "Validation failed.";
-                response.Errors = errors;
-            }
-            return await Task.FromResult(response);
+            return await ValidateDTO(registerDTO, validationRules);
         }
 
-        public async Task<ValidationDTO> ValidateRegister(RegisterDoctorDTO registerDTO)
+
+        public async Task<ValidationDTO> ValidateDoctor(RegisterDoctorDTO registerDTO)
+        {
+            var validationRules = new Dictionary<Func<RegisterDoctorDTO, bool>, string>
+            {
+                { dto => !string.IsNullOrWhiteSpace(dto.FirstName), "Firstname is required." },
+                { dto => !string.IsNullOrWhiteSpace(dto.LastName), "Lastname is required." },
+                { dto => !string.IsNullOrWhiteSpace(dto.Email) && IsValidEmail(dto.Email), "Invalid email format." },
+                { dto => string.IsNullOrWhiteSpace(dto.ContactNum) || IsValidPhoneNumber(dto.ContactNum), "Invalid contact format."},
+                { dto => !string.IsNullOrWhiteSpace(dto.Address), "Invalid address"},
+                { dto => !string.IsNullOrWhiteSpace(dto.Gender) && ValidGender(dto.Gender), "Gender must be male, female or other"},
+                { dto => string.IsNullOrWhiteSpace(dto.Pincode) || Regex.IsMatch(dto.Pincode, @"^\d{6}$"), "Pincode must be lenght of 6 numbers"},
+                { dto => string.IsNullOrWhiteSpace(dto.Specialization) && ValidateSpecialization(dto.Specialization), "Doctor specialization must be EyeSpecialist, Physiotherapist or BrainSurgen"}
+            };
+
+            return await ValidateDTO(registerDTO, validationRules);
+        }
+        public async Task<ValidationDTO> ValidateAppointment(AppointmentDTO appointmentDTO)
+        {
+            var validationRules = new Dictionary<Func<AppointmentDTO, bool>, string>
+            {
+                { dto => dto.PatientId > 0, "Patient ID is required." },
+                { dto => dto.ScheduleStartTime != default(DateTime), "Schedule start time is required." },
+                { dto => dto.ScheduleEndTime != default(DateTime), "Schedule end time is required." },
+                { dto => dto.ScheduleEndTime > dto.ScheduleStartTime, "Schedule end time must be greater than start time." },
+                { dto => !string.IsNullOrWhiteSpace(dto.PatientProblem), "Patient problem is required." },
+                { dto => IsValidAppointmentStatus(dto.AppointmentStatus), "Invalid appointment status." },
+                { dto => !string.IsNullOrWhiteSpace(dto.ConsultDoctor) && ValidateSpecialization(dto.ConsultDoctor), "Consult doctor is required, and must be EyeSpecialist, Physiotherapist or BrainSurgen" }
+            };
+
+            return await ValidateDTO(appointmentDTO, validationRules);
+        }
+
+        // Generic validation method
+        private async Task<ValidationDTO> ValidateDTO<T>(T dto, Dictionary<Func<T, bool>, string> validationRules)
         {
             ValidationDTO response = new ValidationDTO();
             response.Status = 200;
@@ -113,79 +82,12 @@ namespace Service.Service
 
             List<string> errors = new List<string>();
 
-            if (string.IsNullOrWhiteSpace(registerDTO.FirstName))
+            foreach (var rule in validationRules)
             {
-                errors.Add("Firstname is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(registerDTO.LastName))
-            {
-                errors.Add("Lastname is required.");
-            }
-            if (string.IsNullOrWhiteSpace(registerDTO.Email))
-            {
-                errors.Add("Email is required.");
-            }
-            else if (!IsValidEmail(registerDTO.Email))
-            {
-                errors.Add("Invalid email format.");
-            }
-            if (!string.IsNullOrWhiteSpace(registerDTO.ContactNum) && !IsValidPhoneNumber(registerDTO.ContactNum))
-            {
-                errors.Add("Invalid contact number format.");
-            }
-            if (string.IsNullOrWhiteSpace(registerDTO.Address))
-            {
-                errors.Add("Address is required.");
-            }
-            if (string.IsNullOrWhiteSpace(registerDTO.Gender))
-            {
-                errors.Add("Gender is required.");
-            }
-            if (!ValidGender(registerDTO.Gender))
-            {
-                errors.Add("Enter valid gender.");
-            }
-            if (string.IsNullOrWhiteSpace(registerDTO.Pincode))
-            {
-                errors.Add("Pincode is required.");
-            }
-            if (!Regex.IsMatch(registerDTO.Pincode, @"^\d{6}$"))
-            {
-                errors.Add("Pincode must be a 6-digit number.");
-            }
-            if (registerDTO.Specialization != "EyeSpecialist" && registerDTO.Specialization != "Physiotherapist" && registerDTO.Specialization != "BrainSurgen")
-            {
-                errors.Add("Doctor specialization must be EyeSpecialist, Physiotherapist or BrainSurgen");
-            }
-
-            bool ValidGender(string gender)
-            {
-                string lowerCaseGender = gender.ToLower();
-                if (lowerCaseGender != "female" && lowerCaseGender != "male" && lowerCaseGender != "other")
+                if (!rule.Key(dto))
                 {
-                    return false;
+                    errors.Add($"Validation failed: {rule.Value}");
                 }
-                return true;
-            }
-
-
-
-            bool IsValidEmail(string email)
-            {
-                try
-                {
-                    var addr = new System.Net.Mail.MailAddress(email);
-                    return addr.Address == email;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-            bool IsValidPhoneNumber(string phoneNumber)
-            {
-                return Regex.Match(phoneNumber, @"^\d{10}$").Success;
             }
 
             if (errors.Any())
@@ -194,7 +96,51 @@ namespace Service.Service
                 response.Message = "Validation failed.";
                 response.Errors = errors;
             }
-            return await Task.FromResult(response);
+
+            return response;
+        }
+
+        // Validation helper methods
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsValidPhoneNumber(string phoneNumber)
+        {
+            return Regex.Match(phoneNumber, @"^\d{10}$").Success;
+        }
+
+        private bool ValidGender(string gender)
+        {
+            string lowerCaseGender = gender.ToLower();
+            return lowerCaseGender == "female" || lowerCaseGender == "male" || lowerCaseGender == "other";
+        }
+        private bool IsValidAppointmentStatus(string status)
+        {
+            var validStatuses = new List<string> { "Scheduled", "Cancelled", "Rescheduled" };
+            return validStatuses.Contains(status);
+        }
+
+        private bool ValidateRole(string role)
+        {
+            string lowercaseRole = role.ToLower();
+            return Enum.TryParse(lowercaseRole, true, out RoleType _);
+        }
+
+        private bool ValidateSpecialization(string specialization)
+        {
+            string lowerCaseSpec = specialization.ToLower();
+            return lowerCaseSpec == "eyespecialist" || lowerCaseSpec == "physiotherapist" || lowerCaseSpec == "brainsurgen";
         }
     }
+
 }

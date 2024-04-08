@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -23,7 +24,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-        RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+        RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/Role",
     };
 });
 #endregion
@@ -40,12 +41,24 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("Receptionist", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("Receptionist");
+    });
+
     options.AddPolicy("Doctor", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireRole("Doctor"); // Require users to be in the "Doctor" role
+        policy.RequireRole("Doctor");
+    });
+    options.AddPolicy("Nurse", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("Nurse");
     });
 });
+
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -82,12 +95,16 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<IAuthRepo, AuthRepo>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IDoctorRepo, DoctorRepo>();
+builder.Services.AddScoped<IReceptionistRepo, ReceptionistRepo>();
+builder.Services.AddScoped<IPatientRepo, PatientRepo>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
 builder.Services.AddScoped<IPasswordHash, PasswordHash>();
-
+builder.Services.AddScoped<IReceptionistService, ReceptionistService>();
 
 
 var app = builder.Build();

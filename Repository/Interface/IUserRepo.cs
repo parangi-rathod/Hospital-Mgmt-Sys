@@ -6,9 +6,11 @@ namespace Repository.Interface
     {
         Task<bool> UserExistsByEmail(string email);
         Task<bool> UserExistsByContactNum(string contactNum);
+        Task<Users> UserById(int id);
         Task<int> DoctorCount();
         Task<int> NurseCount();
         Task<int> ReceptionistCount();
         Task<bool> isSpecialistDoctorExists(string? specialization);
+        
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public enum RoleType
 {
@@ -26,6 +27,7 @@ namespace Repository.Model
         [Required]
         public string ContactNum { get; set; }
         [Required]
+        [Column(TypeName = "date")]
         public DateTime DateOfBirth { get; set; }
         [Required]
         public string Gender { get; set; }

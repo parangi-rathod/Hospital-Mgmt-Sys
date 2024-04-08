@@ -61,7 +61,7 @@ namespace Repository
                     ScheduleEndTime = DateTime.Now.AddHours(1),
                     PatientProblem = "Some problem",
                     Description = "Some description",
-                    AppointmentStatus = Status.Scheduled,
+                    AppointmentStatus = "Scheduled",
                     ConsultDoctor = "Dr. John Doe", // Assuming doctor exists with this name
                     NurseId = null // Assuming no nurse assigned initially
                 }

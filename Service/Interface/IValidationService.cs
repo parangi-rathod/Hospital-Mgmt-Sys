@@ -4,7 +4,10 @@ namespace Service.Interface
 {
     public interface IValidationService
     {
-        Task<ValidationDTO> ValidateRegister(RegisterUserDTO registerDTO);
-        Task<ValidationDTO> ValidateRegister(RegisterDoctorDTO registerDTO);
+        Task<ValidationDTO> ValidateUser(RegisterUserDTO registerDTO);
+        Task<ValidationDTO> ValidateDoctor(RegisterDoctorDTO registerDTO);
+        Task<ValidationDTO> ValidatePatient(RegisterPatientDTO registerDTO);
+        Task<ValidationDTO> ValidateAppointment(AppointmentDTO appointmentDTO);
+
     }
 }

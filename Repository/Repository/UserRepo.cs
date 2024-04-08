@@ -29,6 +29,11 @@ namespace Repository.Repository
             bool isExists = await _context.Users.AnyAsync(u => u.Email == email);
             return isExists;
         }
+        public async Task<Users> UserById(int id)
+        {
+            var isExists = await _context.Users.FirstOrDefaultAsync(u => u.Id.Equals(id));
+            return isExists;
+        }
         public async Task<int> DoctorCount()
         {
             int docCount = await _context.Users.CountAsync(u => u.Role.Equals(RoleType.Doctor));
@@ -54,5 +59,6 @@ namespace Repository.Repository
             }
             return await _context.SpecialistDoctors.AnyAsync(sd => sd.Specialization == specialization);
         }
+        
     }
 }

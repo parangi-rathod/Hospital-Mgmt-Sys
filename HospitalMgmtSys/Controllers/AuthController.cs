@@ -24,6 +24,7 @@ namespace HospitalMgmtSys.Controllers
 
         [HttpPost]
         [Route("RegisterUser")]
+        [Authorize("Doctor")]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDTO registerDTO)
         {
             var response = await _authService.RegisterUser(registerDTO);

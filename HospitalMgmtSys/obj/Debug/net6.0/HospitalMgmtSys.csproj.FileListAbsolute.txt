@@ -6,6 +6,7 @@ E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\HospitalMgmtSys.runtimeconfi
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\HospitalMgmtSys.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\HospitalMgmtSys.pdb
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\AutoMapper.dll
+E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\BouncyCastle.Cryptography.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\Humanizer.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\MailKit.dll
@@ -25,6 +26,7 @@ E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\Microsoft.IdentityModel.Toke
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\Microsoft.OpenApi.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\MimeKit.dll
+E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\Newtonsoft.Json.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\Swashbuckle.AspNetCore.Swagger.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerUI.dll
@@ -77,5 +79,3 @@ E:\HospitalMgmtSys\HospitalMgmtSys\obj\Debug\net6.0\refint\HospitalMgmtSys.dll
 E:\HospitalMgmtSys\HospitalMgmtSys\obj\Debug\net6.0\HospitalMgmtSys.pdb
 E:\HospitalMgmtSys\HospitalMgmtSys\obj\Debug\net6.0\HospitalMgmtSys.genruntimeconfig.cache
 E:\HospitalMgmtSys\HospitalMgmtSys\obj\Debug\net6.0\ref\HospitalMgmtSys.dll
-E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
-E:\HospitalMgmtSys\HospitalMgmtSys\bin\Debug\net6.0\Newtonsoft.Json.dll

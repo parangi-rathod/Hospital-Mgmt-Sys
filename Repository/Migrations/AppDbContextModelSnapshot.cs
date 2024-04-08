@@ -52,10 +52,10 @@ namespace Repository.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ScheduleEndTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<DateTime>("ScheduleStartTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -74,8 +74,8 @@ namespace Repository.Migrations
                             Description = "Some description",
                             PatientId = 5,
                             PatientProblem = "Some problem",
-                            ScheduleEndTime = new DateTime(2024, 4, 5, 17, 20, 10, 766, DateTimeKind.Local).AddTicks(9903),
-                            ScheduleStartTime = new DateTime(2024, 4, 5, 16, 20, 10, 766, DateTimeKind.Local).AddTicks(9896)
+                            ScheduleEndTime = new DateTime(2024, 4, 8, 17, 36, 41, 343, DateTimeKind.Local).AddTicks(5287),
+                            ScheduleStartTime = new DateTime(2024, 4, 8, 16, 36, 41, 343, DateTimeKind.Local).AddTicks(5275)
                         });
                 });
 
@@ -126,7 +126,7 @@ namespace Repository.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("Email")
                         .IsRequired()
