@@ -45,9 +45,9 @@ namespace Repository.Repository
         //    }
         //    //return await _context.SpecialistDoctors.AnyAsync(sd => sd.Specialization == specialization);
         //}
-        public async Task<bool> checkAvailability(string spec, DateTime startTime)
+        public async Task<bool> checkAvailability(int doctorId, DateTime startTime)
         {
-            bool isAvailability = await _context.Appointments.AnyAsync(u => u.ConsultDoctor.Equals(spec) && u.ScheduleEndTime < startTime);
+            bool isAvailability = await _context.Appointments.AnyAsync(u => u.ConsultDoctorId.Equals(doctorId) && u.ScheduleEndTime < startTime);
             return isAvailability;
         }
 
@@ -74,28 +74,61 @@ namespace Repository.Repository
             return appointments.Cast<dynamic>().ToList();
         }
 
-
-
-        //    var appointments = await _context.Appointments
-        //.Where(a => a.ConsultDoctorId == doctorId && a.ScheduleEndTime > time)
-        //.Include(a => a.Patient)
-        //.Select(a => new AppointmentDTO
-        //{
-        //    FirstName = a.Patient.FirstName,
-        //    LastName = a.Patient.LastName,
-        //    ContactNum = a.Patient.ContactNum,
-        //    Gender = a.Patient.Gender,
-        //    ScheduleStartTime = a.ScheduleStartTime,
-        //    ScheduleEndTime = a.ScheduleEndTime,
-        //    Status = a.AppointmentStatus,
-        //    PatientProblem = a.PatientProblem,
-        //    Description = a.Description
-        //})
-        //.ToListAsync();
-
         public Task<Users> doctorBySpecialization(string spec)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> isAppointmentExists(int appointmentId, int docId)
+        {
+            var isExists = await _context.Appointments.AnyAsync(u => u.Id.Equals(appointmentId) && u.ConsultDoctorId.Equals(docId));
+            return isExists;
+        }
+        public async Task<string> rescheduleAppointment(int appointmentId, DateTime startTime, DateTime endTime)
+        {
+            var updateAppo = await _context.Appointments.FirstOrDefaultAsync(u => u.Id.Equals(appointmentId));
+
+            updateAppo.AppointmentStatus = "Rescheduled";
+            updateAppo.ScheduleStartTime = startTime;
+            updateAppo.ScheduleEndTime = endTime;
+
+            var patientId = updateAppo.PatientId;
+            _context.Update(updateAppo);
+            await _context.SaveChangesAsync();
+
+            var patient = await _context.Users.FirstOrDefaultAsync(u=>u.Id.Equals(patientId));
+            //var rescheduledAppointmentInfo = new
+            //{
+            //    ScheduleStartTime = updateAppo.ScheduleStartTime,
+            //    ScheduleEndTime = updateAppo.ScheduleEndTime,
+            //    PatientFirstName = patient.FirstName,
+            //    PatientLastName = patient.LastName,
+            //    PatientEmail = patient.Email
+            //};
+            return patient.Email;
+
+            //return (dynamic)rescheduledAppointmentInfo;
+        }
+
+        public async Task<string> cancelAppointment(int appointmentId)
+        {
+            var appointment = await _context.Appointments.FirstOrDefaultAsync(u => u.Id.Equals(appointmentId));
+            appointment.AppointmentStatus = "Cancelled";
+            var patientId = appointment.PatientId;
+            _context.Update(appointment);
+            await _context.SaveChangesAsync();
+            var patient = await _context.Users.FirstOrDefaultAsync(u => u.Id.Equals(patientId));
+            string patientEmail = patient.Email;
+            return patientEmail;
+        }
+
+        public async Task<bool> assignNurse(int nurseId, int appointmentId)
+        {
+            var appointment = await _context.Appointments.FirstOrDefaultAsync(u => u.Id.Equals(appointmentId));
+            appointment.NurseId = nurseId;
+            _context.Update(appointment);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

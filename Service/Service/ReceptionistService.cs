@@ -96,10 +96,10 @@ namespace Service.Service
                 }
 
                 var user = await _userRepo.UserById(appointmentDTO.PatientId);
-                //if (user != null)
-                //{
-                //    return new ResponseDTO { Status = 400, Message = "Patient does not exist; please register first." };
-                //}
+                if (user == null)
+                {
+                    return new ResponseDTO { Status = 400, Message = "Patient does not exist; please register first." };
+                }
 
                 var patient = await _patientRepo.IsPatientExists(user.FirstName, user.DateOfBirth, user.Email);
                 if (patient == null && user==null)
@@ -118,14 +118,14 @@ namespace Service.Service
 
                 var doctorSpec = await _docRepo.doctorBySpecialization(appointmentDTO.ConsultDoctorId);
 
-                appointmentDTO.ScheduleStartTime = DateTime.Now;
-                appointmentDTO.ScheduleEndTime = DateTime.Now.AddHours(3);
+                //appointmentDTO.ScheduleStartTime = DateTime.Now;
+                //appointmentDTO.ScheduleEndTime = DateTime.Now.AddHours(3);
 
-                //var isDoctorAvail = await _docRepo.checkAvailability(appointmentDTO.ConsultDoctorId, appointmentDTO.ScheduleStartTime);
-                //if (!isDoctorAvail)
-                //{
-                //    return new ResponseDTO { Status = 400, Message = "Doctor is not available at given time" };
-                //}
+                var isDoctorAvail = await _docRepo.checkAvailability(appointmentDTO.ConsultDoctorId, appointmentDTO.ScheduleStartTime);
+                if (!isDoctorAvail)
+                {
+                    return new ResponseDTO { Status = 400, Message = "Doctor is not available at given time" };
+                }
 
                 var patientAppo = _mapper.Map<Appointment>(appointmentDTO);
 

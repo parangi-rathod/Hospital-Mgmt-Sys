@@ -99,6 +99,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IAuthRepo, AuthRepo>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IDoctorRepo, DoctorRepo>();
+builder.Services.AddScoped<INurseRepo, NurseRepo>();
 builder.Services.AddScoped<IReceptionistRepo, ReceptionistRepo>();
 builder.Services.AddScoped<IPatientRepo, PatientRepo>();
 builder.Services.AddScoped<IAuthService, AuthService>();
