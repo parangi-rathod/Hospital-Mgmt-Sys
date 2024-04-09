@@ -4,6 +4,6 @@ namespace Service.Interface
 {
     public interface INurseService
     {
-        Task<NurseDTO> checkDuties();
+        Task<List<dynamic>> checkDuties(int nurseId);
     }
 }

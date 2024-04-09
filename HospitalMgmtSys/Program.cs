@@ -60,6 +60,11 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser();
         policy.RequireRole("Nurse");
     });
+    options.AddPolicy("Patient", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("Patient");
+    });
 });
 
 
@@ -102,15 +107,18 @@ builder.Services.AddScoped<IDoctorRepo, DoctorRepo>();
 builder.Services.AddScoped<INurseRepo, NurseRepo>();
 builder.Services.AddScoped<IReceptionistRepo, ReceptionistRepo>();
 builder.Services.AddScoped<IPatientRepo, PatientRepo>();
+
+builder.Services.AddScoped<IPasswordHash, PasswordHash>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
 builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
-builder.Services.AddScoped<IPasswordHash, PasswordHash>();
 builder.Services.AddScoped<IReceptionistService, ReceptionistService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<INurseService, NurseService>();
+builder.Services.AddScoped<IPatientService, PatientService>();
+
 
 
 var app = builder.Build();

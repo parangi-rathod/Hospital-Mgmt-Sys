@@ -17,6 +17,8 @@ namespace Repository.Repository
             _context = context;
         }
 
+       
+
         #endregion
         public async Task<Users> GetPatinetById(int id)
         {
@@ -33,6 +35,15 @@ namespace Repository.Repository
             }
             return isExists;
         }
+        public async Task<Appointment> GetCurrentAppointment(int patientId, DateTime currTime)
+        {
+            // Use currTime instead of currentTime
+            Appointment currentAppointment = await _context.Appointments
+                .FirstOrDefaultAsync(u => u.PatientId.Equals(patientId) && u.ScheduleEndTime > currTime);
+
+            return currentAppointment;
+        }
+
 
     }
 }

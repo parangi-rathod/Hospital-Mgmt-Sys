@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository.Repository
 {
@@ -21,14 +16,35 @@ namespace Repository.Repository
             _context = context;
         }
 
+        #endregion
+
         public async Task<bool> isNurseExists(int nurseId)
         {
             bool isExists = await _context.Users.AnyAsync(u=>u.Id.Equals(nurseId) && u.Role.Equals(RoleType.Nurse));
             return isExists;
         }
 
-        #endregion
+        public async Task<List<dynamic>> nurseDuties(int nurseId)
+        {
+            var appointments = await _context.Appointments
+                .Where(a => a.NurseId.Equals(nurseId))
+                .OrderByDescending(a => a.ScheduleStartTime)
+                .Select(a => new
+                {
+                    patientId = "Sterling_" + a.Patient.Id.ToString(),
+                    patientName = a.Patient.FirstName + " " + a.Patient.LastName,
+                    gender = a.Patient.Gender.ToString(),
+                    email = a.Patient.Email,
+                    phoneNumber = a.Patient.ContactNum,
+                    scheduleStartTime = a.ScheduleStartTime,
+                    scheduleEndTime = a.ScheduleEndTime,
+                    patientProblem = a.PatientProblem,
+                    description = a.Description,
+                })
+                .ToListAsync();
 
+            return appointments.Cast<dynamic>().ToList();
+        }
 
 
     }

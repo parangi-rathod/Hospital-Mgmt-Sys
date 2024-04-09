@@ -7,5 +7,6 @@ namespace Repository.Interface
     {
         Task<Users> GetPatinetById(int id);
         Task<Users> IsPatientExists(string name, DateTime dob, string email);
+        Task<Appointment> GetCurrentAppointment(int patientId, DateTime currTime);
     }
 }
