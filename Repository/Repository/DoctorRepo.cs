@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Interface;
 using Repository.Model;
+using System.Dynamic;
 
 namespace Repository.Repository
 {
@@ -122,13 +123,31 @@ namespace Repository.Repository
             return patientEmail;
         }
 
-        public async Task<bool> assignNurse(int nurseId, int appointmentId)
+        public async Task<dynamic> assignNurse(int nurseId, int appointmentId)
         {
-            var appointment = await _context.Appointments.FirstOrDefaultAsync(u => u.Id.Equals(appointmentId));
+            var appointment = await _context.Appointments.FirstOrDefaultAsync(u => u.Id == appointmentId);
+
             appointment.NurseId = nurseId;
             _context.Update(appointment);
             await _context.SaveChangesAsync();
-            return true;
+
+            var patient = await _context.Users.FirstOrDefaultAsync(u => u.Id == appointment.PatientId);
+
+            dynamic result = new
+            {
+                apointmentId = appointment.Id,
+                scheduleStartTime = appointment.ScheduleStartTime,
+                scheduleEndTime=appointment.ScheduleEndTime,
+                patientProb = appointment.PatientProblem,
+                description = appointment.Description,
+                firstname = patient.FirstName,
+                lastname = patient.LastName,
+                gender = patient.Gender,
+                email = patient.Email,
+                contactNum=patient.ContactNum
+            };
+
+            return (dynamic)result;
         }
     }
 }

@@ -1,5 +1,5 @@
+using HospitalMgmtSys;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -10,6 +10,7 @@ using Service;
 using Service.Interface;
 using Service.Service;
 using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,6 +110,10 @@ builder.Services.AddScoped<IReceptionistRepo, ReceptionistRepo>();
 builder.Services.AddScoped<IPatientRepo, PatientRepo>();
 
 builder.Services.AddScoped<IPasswordHash, PasswordHash>();
+
+//builder.Services.AddScoped<IAccToken, HospitalMgmtSys.AccessToken>();
+
+
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();

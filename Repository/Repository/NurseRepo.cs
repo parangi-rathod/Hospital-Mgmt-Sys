@@ -18,10 +18,10 @@ namespace Repository.Repository
 
         #endregion
 
-        public async Task<bool> isNurseExists(int nurseId)
+        public async Task<string> isNurseExists(int nurseId)
         {
-            bool isExists = await _context.Users.AnyAsync(u=>u.Id.Equals(nurseId) && u.Role.Equals(RoleType.Nurse));
-            return isExists;
+            var isExists = await _context.Users.FirstOrDefaultAsync(u=>u.Id.Equals(nurseId) && u.Role.Equals(RoleType.Nurse));
+            return isExists.Email;
         }
 
         public async Task<List<dynamic>> nurseDuties(int nurseId)

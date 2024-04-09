@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Configuration;
 using Repository.Interface;
 using Repository.Model;
 using Service.DTO;
@@ -155,7 +154,7 @@ namespace Service.Service
         }
         #endregion
 
-
+        #region login method
         public async Task<ResponseDTO> Login(LoginDTO loginDTO)
         {
             string PassHash = _passwordHash.GeneratePasswordHash(loginDTO.Password);
@@ -182,11 +181,6 @@ namespace Service.Service
                 };
             }
         }
-
-
-
-        #region miscellaneous methods
-
 
         #endregion
     }

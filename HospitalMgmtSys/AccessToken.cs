@@ -2,18 +2,16 @@
 
 namespace HospitalMgmtSys
 {
-    public class AccessToken
+    public class AccessToken 
     {
-        public int GetUserIdFromClaims(ClaimsPrincipal user)
+        public int GetDoctorIdFromClaims(ClaimsPrincipal User)
         {
-            Claim userIdClaim = user.FindFirst("nameidentifier");
-
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            var doctorIdClaim = User.Claims.FirstOrDefault(c => c.Type == "Id");
+            if (doctorIdClaim != null && int.TryParse(doctorIdClaim.Value, out int doctorId))
             {
-                throw new ArgumentException("Invalid or missing user ID in claims.");
+                return doctorId;
             }
-
-            return userId;
+            return 0; 
         }
     }
 }

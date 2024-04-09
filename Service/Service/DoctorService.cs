@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Repository.Interface;
-using Repository.Model;
-using Repository.Repository;
 using Service.DTO;
 using Service.Interface;
 
@@ -11,51 +9,34 @@ namespace Service.Service
     public class DoctorService : IDoctorService
     {
         #region properties
-        private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
-        private readonly IAuthRepo _authRepo;
-        private readonly IReceptionistRepo _receptionistRepo;
-        private readonly IUserRepo _userRepo;
         private readonly IDoctorRepo _docRepo;
         private readonly INurseRepo _nurseRepo;
-        private readonly IPatientRepo _patientRepo;
-        private readonly IPasswordHash _passwordHash;
-        private readonly IValidationService _validationService;
-        private readonly IHttpContextAccessor _httpCon;
-        private readonly IJWTTokenService _jwtToken;
-
         #endregion
 
         #region ctor
-        public DoctorService(IAuthRepo authRepo, INurseRepo nurseRepo, IJWTTokenService jwtToken, IMapper mapper, IEmailService emailService, IPatientRepo patientRepo, IReceptionistRepo receptionistRepo, IUserRepo userRepo, IDoctorRepo docRepo, IPasswordHash passwordHash, IValidationService validationService)
+        public DoctorService(INurseRepo nurseRepo, IEmailService emailService, IDoctorRepo docRepo, IValidationService validationService)
         {
-            _mapper = mapper;
             _emailService = emailService;
-            _authRepo = authRepo;
-            _userRepo = userRepo;
             _docRepo = docRepo;
             _nurseRepo = nurseRepo;
-            _patientRepo = patientRepo;
-            _receptionistRepo = receptionistRepo;
-            _passwordHash = passwordHash;
-            _validationService = validationService;
         }
-
-
-
         #endregion
-        public async Task<List<dynamic>> getDoctorAppointments(int doctorId)
+
+        public async Task<ResponseDTO> getDoctorAppointments(int doctorId)
         {
             try
             {
                 var doctorAppointments = await _docRepo.checkAppointments(doctorId);
-                //no appointments also
-                return doctorAppointments;
+                if(doctorAppointments == null)
+                {
+                    return new ResponseDTO { Status = 200, Message = "No current doctor appointments" };
+                }
+                return new ResponseDTO { Status = 200, Data = doctorAppointments, Message = "Current doctor appointments" };
             }
             catch (Exception ex)
             {
-                // Log or handle the exception as needed
-                throw;
+                return new ResponseDTO { Status = 400, Message = ex.Message };
             }
         }
 
@@ -123,25 +104,54 @@ namespace Service.Service
         {
             try
             {
-                var isAppoExists = await _docRepo.isAppointmentExists(assignNurseDTO.AppointmentId, doctorId);
-                if (!isAppoExists)
+                // Check if the appointment exists and is assigned to the doctor
+                var appointmentExists = await _docRepo.isAppointmentExists(assignNurseDTO.AppointmentId, doctorId);
+                if (!appointmentExists)
                 {
                     return new ResponseDTO { Status = 400, Message = "Invalid appointment id" };
                 }
-                var isNurseExists = await _nurseRepo.isNurseExists(assignNurseDTO.NurseID);
-                if (!isNurseExists)
+
+                // Check if the nurse exists
+                var nurse = await _nurseRepo.isNurseExists(assignNurseDTO.NurseID);
+                if (nurse == null)
                 {
-                    return new ResponseDTO { Status = 400, Message = "Nurse doesn't exists" };
+                    return new ResponseDTO { Status = 400, Message = "Nurse doesn't exist" };
                 }
-                var assignNurse = await _docRepo.assignNurse(assignNurseDTO.NurseID, assignNurseDTO.AppointmentId);
+
+                // Assign nurse to appointment
+                var result = await _docRepo.assignNurse(assignNurseDTO.NurseID, assignNurseDTO.AppointmentId);
+
+                // Prepare email content
+                //var emailBody = $"<html><body><div style='border: 2px solid #000; padding: 20px;'>" +
+                //  $"<h1 style='color: blue;'>Hello, you have recently been assigned duty for the appointment:</h1>" +
+                //  $"<p><strong>Patient Name:</strong> {result.firstname} {result.lastname}</p>" +
+                //  $"<p><strong>Schedule Start Time:</strong> {result.scheduleStartTime}</p>" +
+                //  $"<p><strong>Schedule End Time:</strong> {result.scheduleEndTime}</p>" +
+                //  "</div></body></html>";
+
+                var emailBody = "<html><body><div style='border: 2px solid #000; padding: 20px;'>" +
+                                $"<h1 style='color: blue;'>Welcome to Streling Hospitals</h1>" + 
+                                "</div>" + "<p>Hello, you have recently been assigned duty for the appointment, check on your dashboard</p>" + "</body></html>";
+
+                // Prepare and send email
+                var emailDTO = new EmailDTO
+                {
+                    Email = nurse,
+                    Subject = "Assigned duty",
+                    Body = emailBody
+                };
+                _emailService.SendEmail(emailDTO);
+
                 return new ResponseDTO { Status = 200, Message = "Nurse assigned successfully" };
             }
             catch (Exception ex)
             {
                 return new ResponseDTO { Status = 400, Message = ex.Message };
             }
-
-
         }
+
+
+
     }
 }
+

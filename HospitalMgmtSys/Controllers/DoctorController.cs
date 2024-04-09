@@ -4,6 +4,7 @@ using Service.DTO;
 using Service.Interface;
 using Service.Service;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 
 namespace HospitalMgmtSys.Controllers
 {
@@ -30,10 +31,10 @@ namespace HospitalMgmtSys.Controllers
         {
             var doctorId = User.Claims.FirstOrDefault(u => u.Type == "Id");
             int idUser = 0;
-            
+
             if (doctorId != null && int.TryParse(doctorId.Value, out int id))
             {
-                idUser = id;   
+                idUser = id;
             }
             var response = await _doctorService.getDoctorAppointments(idUser);
             return Ok(response);
@@ -80,7 +81,7 @@ namespace HospitalMgmtSys.Controllers
             var response = await _doctorService.assignNurse(assignNurseDTO, idUser);
             return Ok(response);
         }
-
-
+      
+        
     }
 }
