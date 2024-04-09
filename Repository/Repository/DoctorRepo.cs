@@ -53,31 +53,27 @@ namespace Repository.Repository
 
         public async Task<List<dynamic>> checkAppointments(int doctorId)
         {
-            var currentTime = DateTime.Now;
-
             var appointments = await _context.Appointments
-                .Where(a => a.ConsultDoctorId == doctorId && a.ScheduleEndTime > currentTime)
-                .Join(
-                    _context.Users, // Join with the Users table
-                    appointment => appointment.PatientId, // Match appointment patient ID
-                    user => user.Id, // With user ID
-                    (appointment, user) => new // Select anonymous object with desired properties
-                    {
-                        user.FirstName,
-                        user.LastName,
-                        user.ContactNum,
-                        user.Gender,
-                        appointment.ScheduleStartTime,
-                        appointment.ScheduleEndTime,
-                        appointment.AppointmentStatus,
-                        appointment.PatientProblem,
-                        appointment.Description
-                    }
-                )
+                .Where(a => a.ConsultDoctorId == doctorId)
+                .OrderByDescending(a => a.ScheduleStartTime)
+                .Select(a => new
+                {
+                    patientId = "Sterling_" + a.Patient.Id.ToString(),
+                    patientName = a.Patient.FirstName + " " + a.Patient.LastName,
+                    gender = a.Patient.Gender.ToString(),
+                    email = a.Patient.Email,
+                    phoneNumber = a.Patient.ContactNum,
+                    scheduleStartTime = a.ScheduleStartTime,
+                    scheduleEndTime = a.ScheduleEndTime,
+                    patientProblem = a.PatientProblem,
+                    description = a.Description,
+                    status = a.AppointmentStatus.ToString()
+                })
                 .ToListAsync();
 
             return appointments.Cast<dynamic>().ToList();
         }
+
 
 
         //    var appointments = await _context.Appointments

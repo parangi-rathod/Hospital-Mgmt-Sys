@@ -4,6 +4,6 @@ namespace Service.Interface
 {
     public interface IDoctorService
     {
-        Task<List<DoctorDTO>> GetDoctorAppointments();
+        Task<List<dynamic>> GetDoctorAppointments(int doctorId);
     }
 }

@@ -45,31 +45,14 @@ namespace Service.Service
         }
 
         #endregion
-        public async Task<List<DoctorDTO>> GetDoctorAppointments()
+        public async Task<List<dynamic>> GetDoctorAppointments(int doctorId)
         {
             try
             {
-                //var userClaim = _httpCon.Users.
-                //if (userIdClaim == null || !int.TryParse(userIdClaim, out int doctorId))
-                //{
-                //    throw new ArgumentException("Invalid or missing doctor ID in claims.");
-                //}
+                var doctorAppointments = await _docRepo.checkAppointments(doctorId);
 
-                // Call the repository method to retrieve doctor appointments
-                int docId = 3;
-                var doctorAppointments = await _docRepo.checkAppointments(docId);
-
-                // Convert the appointments to DoctorDTO objects
-                var doctorDTOs = doctorAppointments.Select(appointment => new DoctorDTO
-                {
-                    FirstName = appointment.FirstName,
-                    LastName = appointment.LastName,
-                    ContactNum = appointment.ContactNum,
-                    Gender = appointment.Gender,
-       
-                }).ToList();
-
-                return doctorDTOs;
+                
+                return doctorAppointments;
             }
             catch (Exception ex)
             {
@@ -77,6 +60,8 @@ namespace Service.Service
                 throw;
             }
         }
+
+
 
 
 

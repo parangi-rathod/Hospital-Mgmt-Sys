@@ -25,14 +25,14 @@ namespace Service.Service
             var uId = userId.ToString();
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, uId),
+                new Claim("Id", uId),
                 new Claim(ClaimTypes.Role, userRole),
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config.GetSection("JWT:Key").Value));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(_config["JWT:Issuer"], _config["JWT:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(20),
+                expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: cred
             );
             var jwt =  new JwtSecurityTokenHandler().WriteToken(token);
