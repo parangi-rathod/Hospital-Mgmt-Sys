@@ -38,12 +38,33 @@ namespace Repository.Repository
         public async Task<Appointment> GetCurrentAppointment(int patientId, DateTime currTime)
         {
             // Use currTime instead of currentTime
-            Appointment currentAppointment = await _context.Appointments
-                .FirstOrDefaultAsync(u => u.PatientId.Equals(patientId) && u.ScheduleEndTime > currTime);
+            //Appointment currentAppointment = await _context.Appointments
+            //    .FirstOrDefaultAsync(u => u.PatientId.Equals(patientId) && u.ScheduleEndTime > currTime);
 
-            return currentAppointment;
+            //return currentAppointment;
+            return await _context.Appointments
+               .Where(a => a.PatientId == patientId && a.ScheduleStartTime >= DateTime.Now)
+               .OrderByDescending(a => a.ScheduleStartTime)
+               .FirstOrDefaultAsync();
         }
 
+        public async Task<List<dynamic>> AppointmentHistory(int patientId)
+        {
+            var appointments = await _context.Appointments
+                .Where(a => a.PatientId.Equals(patientId))
+                .OrderByDescending(a => a.ScheduleStartTime)
+                .Select(a => new 
+                {
+                    PatientId = "Sterling_" + a.Patient.Id.ToString(),
+                    ScheduleStartTime = a.ScheduleStartTime,
+                    ScheduleEndTime = a.ScheduleEndTime,
+                    PatientProblem = a.PatientProblem,
+                    Description = a.Description,
+                })
+                .ToListAsync();
+
+            return appointments.Cast<dynamic>().ToList();
+        }
 
     }
 }

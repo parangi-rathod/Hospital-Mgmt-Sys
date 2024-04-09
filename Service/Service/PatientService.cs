@@ -27,6 +27,8 @@ namespace Service.Service
             _patientRepo = patientRepo;            
         }
 
+        
+
         #endregion
 
         public async Task<ResponseDTO> getCurrentAppointment(int patientId)
@@ -51,5 +53,30 @@ namespace Service.Service
             }
         }
 
+        public async Task<ResponseDTO> appointmentHistory(int patientId)
+        {
+            try
+            {
+                List<dynamic> appoHist = await _patientRepo.AppointmentHistory(patientId);
+                if (appoHist == null)
+                {
+                    return new ResponseDTO
+                    {
+                        Status = 200,
+                        Message = "No Previous appointments"
+                    };
+                }
+                return new ResponseDTO
+                {
+                    Status = 200,
+                    Data = appoHist,
+                    Message = "Previous appointments"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseDTO { Status = 500, Message = ex.Message };
+            }
+        }
     }
 }
