@@ -36,6 +36,9 @@ builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Conf
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+builder.Services.AddHttpContextAccessor();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -105,6 +108,8 @@ builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
 builder.Services.AddScoped<IPasswordHash, PasswordHash>();
 builder.Services.AddScoped<IReceptionistService, ReceptionistService>();
+builder.Services.AddScoped<IDoctorService, DoctorService>();
+builder.Services.AddScoped<INurseService, NurseService>();
 
 
 var app = builder.Build();

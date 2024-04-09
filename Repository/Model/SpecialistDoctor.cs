@@ -6,11 +6,12 @@ namespace Repository.Model
    
     public class SpecialistDoctor
     {
+        [Key]
+        public int Id { get; set; }
         [Required]
         [ForeignKey("Users")]
-        public int Id { get; set; }
         public int UserId { get; set; }
-        public virtual Users User { get; set; } 
+        public virtual Users User { get; set; }
         public string Specialization { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 public enum RoleType
@@ -23,6 +24,7 @@ namespace Repository.Model
         [EmailAddress]
         public string Email { get; set; }
         [Required]
+        [JsonIgnore]
         public string Password { get; set; }
         [Required]
         public string ContactNum { get; set; }

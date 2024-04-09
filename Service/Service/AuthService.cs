@@ -68,8 +68,8 @@ namespace Service.Service
                     string Fullname = registerUserDTO.FirstName + " " + registerUserDTO.LastName;
                     var emailDTO = new EmailDTO
                     {
-                        Email = registerUserDTO.Email, // Ensuring Email is not null
-                        Name = Fullname, // Ensuring Fullname is not null
+                        Email = registerUserDTO.Email, 
+                        Name = Fullname, 
                         Subject = "Successfully Registered",
                         Body = "Welcome to Sterling Hospitals! You have successfully registered as " + user.Role
                                 + ". \nYou can Login into system using " + (registerUserDTO.Password ?? "") // Ensuring Password is not null
@@ -109,8 +109,8 @@ namespace Service.Service
                     return new ResponseDTO { Status = 400, Message = "Validation failed.", Error = string.Join("; ", validationResult.Errors) };
                 }
                 var specializationString = registerDoctorDTO.Specialization;
-                
 
+               
                 if (await _userRepo.isSpecialistDoctorExists(specializationString))
                 {
                     return new ResponseDTO { Status = 400, Message = "A doctor with this specialization already exists." };
@@ -118,6 +118,8 @@ namespace Service.Service
 
                 string passHash = _passwordHash.GeneratePasswordHash(registerDoctorDTO.Password);
                 
+                
+
                 var user = _mapper.Map<Users>(registerDoctorDTO);
                 user.Password = passHash;
                 
@@ -126,7 +128,6 @@ namespace Service.Service
                 var specialization = registerDoctorDTO.Specialization;
                 if (specialization != null)
                 {
-                    
                     var specializationEntity = new SpecialistDoctor
                     {
                         UserId = reg.Id,
@@ -162,9 +163,9 @@ namespace Service.Service
             if (user != null)
             {
                 string userRoleString = user.Role.ToString();
-                string token = _jwtToken.GenerateJwtToken(userRoleString);
+                string userId = user.Id.ToString();
+                string token = _jwtToken.GenerateJwtToken(userRoleString, userId);
 
-                // Now, you need to return the token as part of your ResponseDTO
                 return new ResponseDTO
                 {
                     Status = 200,

@@ -36,16 +36,14 @@ namespace Repository.Repository
         {
             bool isUserExistsByCon = await _userRepo.UserExistsByContactNum(username);
             bool isUserExistsByEmail = await _userRepo.UserExistsByEmail(username);
-            
+
             if (isUserExistsByCon || isUserExistsByEmail)
             {
                 var user = await _context.Users.FirstOrDefaultAsync(u => (u.ContactNum.Equals(username) || u.Email.Equals(username)) && u.Password.Equals(password));
                 return user;
             }
             return null;
-        }
-
-       
+        } 
 
     }
 }

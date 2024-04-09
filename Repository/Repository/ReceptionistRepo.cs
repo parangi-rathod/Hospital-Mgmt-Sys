@@ -19,10 +19,19 @@ namespace Repository.Repository
 
         public async Task<bool> ScheduleAppointment(Appointment appointment)
         {
-            _context.Appointments.Add(appointment);
-            await _context.SaveChangesAsync();
-            return true;
+            try
+            {
+                _context.Appointments.Add(appointment);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var innerException = ex.InnerException;
+                return false; 
+            }
         }
+
 
     }
 }

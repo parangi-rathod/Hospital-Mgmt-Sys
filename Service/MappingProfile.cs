@@ -9,7 +9,7 @@ namespace Service
         public MappingProfile()
         {
             CreateMap<RegisterUserDTO, Users>().ForMember(dest => dest.Role, opt => opt.MapFrom(src => MapRole(src.Role))).ReverseMap();
-            CreateMap<RegisterPatientDTO, Users>().ReverseMap();
+            CreateMap<RegisterPatientDTO, Users>().ForMember(dest => dest.Role, opt => opt.MapFrom(src => MapRole(src.Role))).ReverseMap();
             CreateMap<RegisterDoctorDTO, Users>()
             .ConstructUsing((src, ctx) => new Users()) 
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => RoleType.Doctor));
@@ -24,6 +24,8 @@ namespace Service
                     return RoleType.Nurse;
                 case "receptionist":
                     return RoleType.Receptionist;
+                case "patient":
+                    return RoleType.Patient;
                 default:
                     throw new ArgumentException($"Invalid role: {role}");
             }

@@ -55,10 +55,10 @@ namespace Repository.Repository
         {
             if (specialization == null)
             {
-                return false; 
+                return false;
             }
             return await _context.SpecialistDoctors.AnyAsync(sd => sd.Specialization == specialization);
         }
-        
+
     }
 }

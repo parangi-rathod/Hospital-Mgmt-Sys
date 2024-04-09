@@ -34,11 +34,11 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ConsultDoctor")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ConsultDoctorId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("NurseId")
@@ -59,24 +59,13 @@ namespace Repository.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ConsultDoctorId");
+
                     b.HasIndex("NurseId");
 
                     b.HasIndex("PatientId");
 
                     b.ToTable("Appointments");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AppointmentStatus = "Scheduled",
-                            ConsultDoctor = "Dr. John Doe",
-                            Description = "Some description",
-                            PatientId = 5,
-                            PatientProblem = "Some problem",
-                            ScheduleEndTime = new DateTime(2024, 4, 8, 17, 36, 41, 343, DateTimeKind.Local).AddTicks(5287),
-                            ScheduleStartTime = new DateTime(2024, 4, 8, 16, 36, 41, 343, DateTimeKind.Local).AddTicks(5275)
-                        });
                 });
 
             modelBuilder.Entity("Repository.Model.SpecialistDoctor", b =>
@@ -105,7 +94,7 @@ namespace Repository.Migrations
                         {
                             Id = 2,
                             Specialization = "EyeSpecialist",
-                            UserId = 5
+                            UserId = 1
                         });
                 });
 
@@ -163,24 +152,29 @@ namespace Repository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 5,
+                            Id = 1,
                             Address = "123 Main St",
                             ContactNum = "1234567890",
                             DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "john@example.com",
+                            Email = "archana.vyas@bacancy.com",
                             FirstName = "Archana",
-                            Gender = "Male",
-                            LastName = "Doe",
-                            Password = "password123",
-                            Pincode = "12345",
+                            Gender = "Female",
+                            LastName = "Vyas",
+                            Password = "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+                            Pincode = "123456",
                             Role = "Doctor"
                         });
                 });
 
             modelBuilder.Entity("Repository.Model.Appointment", b =>
                 {
+                    b.HasOne("Repository.Model.Users", "ConsultDoctor")
+                        .WithMany("Doctor")
+                        .HasForeignKey("ConsultDoctorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Repository.Model.Users", "Nurse")
-                        .WithMany()
+                        .WithMany("Nurse")
                         .HasForeignKey("NurseId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -189,6 +183,8 @@ namespace Repository.Migrations
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ConsultDoctor");
 
                     b.Navigation("Nurse");
 
@@ -204,6 +200,13 @@ namespace Repository.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Repository.Model.Users", b =>
+                {
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Nurse");
                 });
 #pragma warning restore 612, 618
         }

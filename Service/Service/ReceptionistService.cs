@@ -48,9 +48,10 @@ namespace Service.Service
                         return new ResponseDTO { Status = 400, Message = "Patient already exists." };
                     }
 
-                    var patientPassword = $"{registerPatientDTO.FirstName}{registerPatientDTO.DateOfBirth:yyyyMMdd}";
+                    string patientPassword = $"{registerPatientDTO.FirstName}{registerPatientDTO.DateOfBirth:yyyyMMdd}";
 
                     string passHash = _passwordHash.GeneratePasswordHash(patientPassword);
+                    
                     var user = _mapper.Map<Users>(registerPatientDTO);
                     user.Password = passHash;
 
@@ -106,19 +107,34 @@ namespace Service.Service
                     return new ResponseDTO { Status = 400, Message = "Patient does not exist; please register first." };
                 }
 
-                var doctor = await _docRepo.DoctorBySpecialization(appointmentDTO.ConsultDoctor);
+                //var doctor = await _docRepo.doctorBySpecialization(appointmentDTO.DoctorId);
+
+                //if (doctor != null)
+                //{
+                //    appointmentDTO.DoctorId = doctor.Id;
+                //}
+
+                var doctor = await _userRepo.UserById(appointmentDTO.ConsultDoctorId);
+
+                var doctorSpec = await _docRepo.doctorBySpecialization(appointmentDTO.ConsultDoctorId);
 
                 appointmentDTO.ScheduleStartTime = DateTime.Now;
                 appointmentDTO.ScheduleEndTime = DateTime.Now.AddHours(3);
 
-                var isDoctorAvail = await _docRepo.checkAvailability(appointmentDTO.ConsultDoctor, appointmentDTO.ScheduleStartTime);
-                if (!isDoctorAvail)
-                {
-                    return new ResponseDTO { Status = 400, Message = "Doctor is not available at given time" };
-                }
+                //var isDoctorAvail = await _docRepo.checkAvailability(appointmentDTO.ConsultDoctorId, appointmentDTO.ScheduleStartTime);
+                //if (!isDoctorAvail)
+                //{
+                //    return new ResponseDTO { Status = 400, Message = "Doctor is not available at given time" };
+                //}
 
                 var patientAppo = _mapper.Map<Appointment>(appointmentDTO);
-                await _receptionistRepo.ScheduleAppointment(patientAppo);
+
+
+                bool scheduleAppo = await _receptionistRepo.ScheduleAppointment(patientAppo);
+                if (!scheduleAppo)
+                {
+                    return new ResponseDTO { Status = 400, Message = "Inner exception occurs" };
+                }
 
                 var emailDTO = new EmailDTO
                 {
@@ -128,7 +144,7 @@ namespace Service.Service
                    "<div style='border: 2px solid #000; padding: 20px;'>" +
                    "<h1 style='color: blue;'>Welcome to Sterling Hospitals!</h1>" +
                    "<p style='font-size: 16px;'>Dear " + patient.FirstName + " " + patient.LastName + ",</p>" +
-                   "<p style='font-size: 16px;'>Your appointment has been scheduled with Dr. " + doctor.FirstName + " " + doctor.LastName + " (" + appointmentDTO.ConsultDoctor + ").</p>" +
+                   "<p style='font-size: 16px;'>Your appointment has been scheduled with Dr. " + doctor.FirstName + " " + doctor.LastName + " (" + doctorSpec + ").</p>" +
                    "<p style='font-size: 16px;'>Appointment Details:</p>" +
                    "<ul>" +
                    "<li><strong>Schedule Start Time:</strong> " + appointmentDTO.ScheduleStartTime.ToString("yyyy-MM-dd HH:mm:ss") + "</li>" +
@@ -139,7 +155,7 @@ namespace Service.Service
     
                 };
 
-                _emailService.SendEmail(emailDTO);
+                //_emailService.SendEmail(emailDTO);
                 return new ResponseDTO { Status = 200, Message = "Appointment scheduled successfully." };
             }
             catch (Exception ex)

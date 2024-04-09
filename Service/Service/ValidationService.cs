@@ -1,7 +1,5 @@
-﻿using Repository.Model;
-using Service.DTO;
+﻿using Service.DTO;
 using Service.Interface;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 
 namespace Service.Service
@@ -52,7 +50,8 @@ namespace Service.Service
                 { dto => !string.IsNullOrWhiteSpace(dto.Address), "Invalid address"},
                 { dto => !string.IsNullOrWhiteSpace(dto.Gender) && ValidGender(dto.Gender), "Gender must be male, female or other"},
                 { dto => string.IsNullOrWhiteSpace(dto.Pincode) || Regex.IsMatch(dto.Pincode, @"^\d{6}$"), "Pincode must be lenght of 6 numbers"},
-                { dto => string.IsNullOrWhiteSpace(dto.Specialization) && ValidateSpecialization(dto.Specialization), "Doctor specialization must be EyeSpecialist, Physiotherapist or BrainSurgen"}
+                { dto => !string.IsNullOrWhiteSpace(dto.Specialization) && ValidateSpecialization(dto.Specialization), "Doctor specialization must be EyeSpecialist, Physiotherapist, or BrainSurgen" }
+
             };
 
             return await ValidateDTO(registerDTO, validationRules);
@@ -67,7 +66,7 @@ namespace Service.Service
                 { dto => dto.ScheduleEndTime > dto.ScheduleStartTime, "Schedule end time must be greater than start time." },
                 { dto => !string.IsNullOrWhiteSpace(dto.PatientProblem), "Patient problem is required." },
                 { dto => IsValidAppointmentStatus(dto.AppointmentStatus), "Invalid appointment status." },
-                { dto => !string.IsNullOrWhiteSpace(dto.ConsultDoctor) && ValidateSpecialization(dto.ConsultDoctor), "Consult doctor is required, and must be EyeSpecialist, Physiotherapist or BrainSurgen" }
+                //{ dto => !string.IsNullOrWhiteSpace(dto.ConsultDoctor) && !ValidateSpecialization(dto.ConsultDoctor), "Consult doctor is required, and must be EyeSpecialist, Physiotherapist or BrainSurgen" }
             };
 
             return await ValidateDTO(appointmentDTO, validationRules);
@@ -139,7 +138,11 @@ namespace Service.Service
         private bool ValidateSpecialization(string specialization)
         {
             string lowerCaseSpec = specialization.ToLower();
-            return lowerCaseSpec == "eyespecialist" || lowerCaseSpec == "physiotherapist" || lowerCaseSpec == "brainsurgen";
+            if (lowerCaseSpec == "eyespecialist" || lowerCaseSpec == "physiotherapist" || lowerCaseSpec == "brainsurgen")
+            {
+                return true;
+            }
+            return false;
         }
     }
 

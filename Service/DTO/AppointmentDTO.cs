@@ -1,8 +1,4 @@
-﻿using Repository.Model;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace Service.DTO
+﻿namespace Service.DTO
 {
     public class AppointmentDTO
     {       
@@ -12,7 +8,6 @@ namespace Service.DTO
         public string PatientProblem { get; set; }
         public string? Description { get; set; }
         public string AppointmentStatus { get; set; }
-        public string ConsultDoctor { get; set; }
-        public int? NurseId { get; } = null;
+        public int ConsultDoctorId { get; set; }
     }
 }
