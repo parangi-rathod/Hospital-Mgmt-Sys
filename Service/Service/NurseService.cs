@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Repository.Interface;
 using Service.DTO;
 using Service.Interface;
@@ -9,52 +8,43 @@ namespace Service.Service
     public class NurseService : INurseService
     {
         #region properties
-        private readonly IMapper _mapper;
-        private readonly IEmailService _emailService;
-        private readonly IAuthRepo _authRepo;
-        private readonly IReceptionistRepo _receptionistRepo;
-        private readonly IUserRepo _userRepo;
-        private readonly IDoctorRepo _docRepo;
         private readonly INurseRepo _nurseRepo;
-        private readonly IPatientRepo _patientRepo;
-        private readonly IPasswordHash _passwordHash;
-        private readonly IValidationService _validationService;
-        private readonly IHttpContextAccessor _httpCon;
-        private readonly IJWTTokenService _jwtToken;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         #endregion
 
         #region ctor
-        public NurseService(IAuthRepo authRepo, INurseRepo nurseRepo, IJWTTokenService jwtToken, IMapper mapper, IEmailService emailService, IPatientRepo patientRepo, IReceptionistRepo receptionistRepo, IUserRepo userRepo, IDoctorRepo docRepo, IPasswordHash passwordHash, IValidationService validationService)
-        {
-            _mapper = mapper;
-            _emailService = emailService;
-            _authRepo = authRepo;
-            _userRepo = userRepo;
-            _docRepo = docRepo;
-            _nurseRepo = nurseRepo;
-            _patientRepo = patientRepo;
-            _receptionistRepo = receptionistRepo;
-            _passwordHash = passwordHash;
-            _validationService = validationService;
+        public NurseService(IHttpContextAccessor httpContextAccessor,INurseRepo nurseRepo)
+        {            
+            _nurseRepo = nurseRepo;            
+            _httpContextAccessor = httpContextAccessor;
         }
 
-
-
         #endregion
-        public async Task<List<dynamic>> checkDuties(int nurseId)
+
+        #region check duties
+        public async Task<ResponseDTO> checkDuties()
         {
             try
             {
-                var nurseAppointments = await _nurseRepo.nurseDuties(nurseId);
-                //no appointments also
-                return nurseAppointments;
+                var userIdClaim = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id");
+                int nurse = 0;
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int res))
+                {
+                    nurse = res;
+                }
+                var nurseAppointments = await _nurseRepo.nurseDuties(nurse);
+                if (nurseAppointments == null)
+                {
+                    return new ResponseDTO { Status = 200, Message = "No current nurse duties assigned yet" };
+                }
+                return new ResponseDTO { Status = 200, Data = nurseAppointments, Message = "Current nurse duties" };
             }
             catch (Exception ex)
             {
-                // Log or handle the exception as needed
-                throw;
+                return new ResponseDTO { Status = 400, Message = ex.Message };
             }
         }
+        #endregion
     }
 }

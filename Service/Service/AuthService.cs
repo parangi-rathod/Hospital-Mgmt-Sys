@@ -33,7 +33,7 @@ namespace Service.Service
 
         #endregion
 
-        #region register methods
+        #region register user(nurse,receptionist
         public async Task<ResponseDTO> RegisterUser(RegisterUserDTO registerUserDTO)
         {
             try
@@ -46,20 +46,20 @@ namespace Service.Service
                     var user = _mapper.Map<Users>(registerUserDTO);
                     user.Password = passHash;
 
-                    if(registerUserDTO.Role.Equals(RoleType.Nurse))
+                    if(registerUserDTO.Role.Equals("Nurse"))
                     {
                         var nurseCount = await _userRepo.NurseCount(); 
                         if (nurseCount >= 10)
                         {
-                            return new ResponseDTO { Status = 400, Message = "System already contains 10 nurses." };
+                            return new ResponseDTO { Status = 400, Message = "Can't register, system already contains 10 nurses." };
                         }
                     }
-                    if(registerUserDTO.Role.Equals(RoleType.Receptionist))
+                    if(registerUserDTO.Role.Equals("Receptionist"))
                     {
                         var receptionistCount = await _userRepo.ReceptionistCount(); 
                         if (receptionistCount >= 2)
                         {
-                            return new ResponseDTO { Status = 400, Message = "System already contains 2 receptionist." };
+                            return new ResponseDTO { Status = 400, Message = "Can't register, system already contains 2 receptionist." };
                         }
                     }
 
@@ -90,6 +90,9 @@ namespace Service.Service
                 return new ResponseDTO { Status = 500, Message = $"Error: {ex.Message}" };
             }
         }
+        #endregion
+
+        #region register doctor
 
         public async Task<ResponseDTO> RegisterDoctor(RegisterDoctorDTO registerDoctorDTO)
         {
@@ -116,8 +119,6 @@ namespace Service.Service
                 }
 
                 string passHash = _passwordHash.GeneratePasswordHash(registerDoctorDTO.Password);
-                
-                
 
                 var user = _mapper.Map<Users>(registerDoctorDTO);
                 user.Password = passHash;

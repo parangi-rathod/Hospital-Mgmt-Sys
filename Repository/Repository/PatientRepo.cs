@@ -17,37 +17,46 @@ namespace Repository.Repository
             _context = context;
         }
 
-       
+
 
         #endregion
+
+        #region get patient by id
         public async Task<Users> GetPatinetById(int id)
         {
             var isExists = await _context.Users.FirstOrDefaultAsync(u => u.Id.Equals(id) && u.Role.Equals(RoleType.Patient));
             return isExists;
         }
+        #endregion
+
+        #region is patient exists
 
         public async Task<Users> IsPatientExists(string name, DateTime dob, string email)
         {
-            var isExists = await _context.Users.FirstOrDefaultAsync(u => u.FirstName.Equals(name) && u.DateOfBirth.Equals(dob) && u.Email.Equals(email));
-            if(isExists == null)
+            var existingPatient = await _context.Users.FirstOrDefaultAsync(u =>
+                u.FirstName.Equals(name) &&
+                u.DateOfBirth.Date == dob.Date &&  
+                u.Email.Equals(email));
+
+            if(existingPatient != null)
             {
-                return null;
+                return existingPatient;
             }
-            return isExists;
+            return null;
         }
+        #endregion
+
+        #region get current appointment
         public async Task<Appointment> GetCurrentAppointment(int patientId, DateTime currTime)
         {
-            // Use currTime instead of currentTime
-            //Appointment currentAppointment = await _context.Appointments
-            //    .FirstOrDefaultAsync(u => u.PatientId.Equals(patientId) && u.ScheduleEndTime > currTime);
-
-            //return currentAppointment;
             return await _context.Appointments
                .Where(a => a.PatientId == patientId && a.ScheduleStartTime >= DateTime.Now)
                .OrderByDescending(a => a.ScheduleStartTime)
                .FirstOrDefaultAsync();
         }
+        #endregion
 
+        #region appointment history
         public async Task<List<dynamic>> AppointmentHistory(int patientId)
         {
             var appointments = await _context.Appointments
@@ -65,6 +74,6 @@ namespace Repository.Repository
 
             return appointments.Cast<dynamic>().ToList();
         }
-
+        #endregion
     }
 }

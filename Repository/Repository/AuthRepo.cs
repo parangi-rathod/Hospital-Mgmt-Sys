@@ -20,18 +20,25 @@ namespace Repository.Repository
         }
         #endregion
 
+        #region register
         public async Task<Users> Register(Users user)
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
         }
+        #endregion
+
+        #region specialist doctor register
         public async Task<bool> SpecialistDoctorReg(SpecialistDoctor specialistDoctor)
         {
             _context.SpecialistDoctors.Add(specialistDoctor);
             await _context.SaveChangesAsync();
             return true;
         }
+        #endregion
+
+        #region login
         public async Task<Users> Login(string username, string password)
         {
             bool isUserExistsByCon = await _userRepo.UserExistsByContactNum(username);
@@ -44,6 +51,7 @@ namespace Repository.Repository
             }
             return null;
         } 
+        #endregion
 
     }
 }

@@ -6,6 +6,7 @@ namespace Service.Service
 {
     public class ValidationService : IValidationService
     {
+        #region user validation
         public async Task<ValidationDTO> ValidateUser(RegisterUserDTO registerDTO)
         {
             var validationRules = new Dictionary<Func<RegisterUserDTO, bool>, string>
@@ -22,6 +23,9 @@ namespace Service.Service
 
             return await ValidateDTO(registerDTO, validationRules);
         }
+        #endregion
+
+        #region patient validation
         public async Task<ValidationDTO> ValidatePatient(RegisterPatientDTO registerDTO)
         {
             var validationRules = new Dictionary<Func<RegisterPatientDTO, bool>, string>
@@ -37,7 +41,9 @@ namespace Service.Service
 
             return await ValidateDTO(registerDTO, validationRules);
         }
+        #endregion
 
+        #region doctor validation
 
         public async Task<ValidationDTO> ValidateDoctor(RegisterDoctorDTO registerDTO)
         {
@@ -53,9 +59,11 @@ namespace Service.Service
                 { dto => !string.IsNullOrWhiteSpace(dto.Specialization) && ValidateSpecialization(dto.Specialization), "Doctor specialization must be EyeSpecialist, Physiotherapist, or BrainSurgen" }
 
             };
-
             return await ValidateDTO(registerDTO, validationRules);
         }
+        #endregion
+
+        #region appointment validation
         public async Task<ValidationDTO> ValidateAppointment(AppointmentDTO appointmentDTO)
         {
             var validationRules = new Dictionary<Func<AppointmentDTO, bool>, string>
@@ -66,12 +74,13 @@ namespace Service.Service
                 { dto => dto.ScheduleEndTime > dto.ScheduleStartTime, "Schedule end time must be greater than start time." },
                 { dto => !string.IsNullOrWhiteSpace(dto.PatientProblem), "Patient problem is required." },
                 { dto => IsValidAppointmentStatus(dto.AppointmentStatus), "Invalid appointment status." },
-                //{ dto => !string.IsNullOrWhiteSpace(dto.ConsultDoctor) && !ValidateSpecialization(dto.ConsultDoctor), "Consult doctor is required, and must be EyeSpecialist, Physiotherapist or BrainSurgen" }
             };
 
             return await ValidateDTO(appointmentDTO, validationRules);
         }
+        #endregion
 
+        #region generic method
         // Generic validation method
         private async Task<ValidationDTO> ValidateDTO<T>(T dto, Dictionary<Func<T, bool>, string> validationRules)
         {
@@ -99,7 +108,6 @@ namespace Service.Service
             return response;
         }
 
-        // Validation helper methods
         private bool IsValidEmail(string email)
         {
             try
@@ -112,7 +120,9 @@ namespace Service.Service
                 return false;
             }
         }
+        #endregion
 
+        #region private methods
         private bool IsValidPhoneNumber(string phoneNumber)
         {
             return Regex.Match(phoneNumber, @"^\d{10}$").Success;
@@ -144,6 +154,7 @@ namespace Service.Service
             }
             return false;
         }
+        #endregion
     }
 
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Interface;
 using Repository.Model;
-using System.Dynamic;
 
 namespace Repository.Repository
 {
@@ -20,11 +19,11 @@ namespace Repository.Repository
 
         #endregion
 
-
+        #region doctor by specialization
         public async Task<string> doctorBySpecialization(int doctorId)
         {
             var specialistDoctor = await _context.SpecialistDoctors
-                .Include(sd => sd.User) // Include the associated user details
+                .Include(sd => sd.User) 
                 .FirstOrDefaultAsync(sd => sd.UserId == doctorId);
 
             if (specialistDoctor != null)
@@ -36,22 +35,20 @@ namespace Repository.Repository
                 return null;
             }
         }
+        #endregion
 
-
-        //public async Task<bool> isSpecialistDoctorExists(string? specialization)
-        //{
-        //    if (specialization == null)
-        //    {
-        //        return false;
-        //    }
-        //    //return await _context.SpecialistDoctors.AnyAsync(sd => sd.Specialization == specialization);
-        //}
-        public async Task<bool> checkAvailability(int doctorId, DateTime startTime)
+        #region check avaiability
+        public async Task<bool> checkAvailability(int doctorId, DateTime startTime, DateTime endTime)
         {
-            bool isAvailability = await _context.Appointments.AnyAsync(u => u.ConsultDoctorId.Equals(doctorId) && u.ScheduleEndTime < startTime);
-            return isAvailability;
+            bool isAvailable = await _context.Appointments.AnyAsync(u =>
+                u.ConsultDoctorId == doctorId &&
+                u.ScheduleStartTime < endTime && 
+                u.ScheduleEndTime > startTime); 
+            return !isAvailable;
         }
+        #endregion
 
+        #region check appointments
         public async Task<List<dynamic>> checkAppointments(int doctorId)
         {
             var appointments = await _context.Appointments
@@ -74,17 +71,19 @@ namespace Repository.Repository
 
             return appointments.Cast<dynamic>().ToList();
         }
+        #endregion
 
-        public Task<Users> doctorBySpecialization(string spec)
-        {
-            throw new NotImplementedException();
-        }
+        #region is appointment exists
+       
 
         public async Task<bool> isAppointmentExists(int appointmentId, int docId)
         {
             var isExists = await _context.Appointments.AnyAsync(u => u.Id.Equals(appointmentId) && u.ConsultDoctorId.Equals(docId));
             return isExists;
         }
+        #endregion
+
+        #region reschedule appointment
         public async Task<string> rescheduleAppointment(int appointmentId, DateTime startTime, DateTime endTime)
         {
             var updateAppo = await _context.Appointments.FirstOrDefaultAsync(u => u.Id.Equals(appointmentId));
@@ -98,18 +97,13 @@ namespace Repository.Repository
             await _context.SaveChangesAsync();
 
             var patient = await _context.Users.FirstOrDefaultAsync(u=>u.Id.Equals(patientId));
-            //var rescheduledAppointmentInfo = new
-            //{
-            //    ScheduleStartTime = updateAppo.ScheduleStartTime,
-            //    ScheduleEndTime = updateAppo.ScheduleEndTime,
-            //    PatientFirstName = patient.FirstName,
-            //    PatientLastName = patient.LastName,
-            //    PatientEmail = patient.Email
-            //};
+           
             return patient.Email;
 
-            //return (dynamic)rescheduledAppointmentInfo;
         }
+        #endregion
+
+        #region cancel appointment
 
         public async Task<string> cancelAppointment(int appointmentId)
         {
@@ -122,7 +116,9 @@ namespace Repository.Repository
             string patientEmail = patient.Email;
             return patientEmail;
         }
+        #endregion
 
+        #region assign nurse
         public async Task<dynamic> assignNurse(int nurseId, int appointmentId)
         {
             var appointment = await _context.Appointments.FirstOrDefaultAsync(u => u.Id == appointmentId);
@@ -149,5 +145,6 @@ namespace Repository.Repository
 
             return (dynamic)result;
         }
+        #endregion
     }
 }

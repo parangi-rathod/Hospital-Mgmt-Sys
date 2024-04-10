@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Repository.Interface;
 using Service.DTO;
 using Service.Interface;
@@ -12,21 +11,30 @@ namespace Service.Service
         private readonly IEmailService _emailService;
         private readonly IDoctorRepo _docRepo;
         private readonly INurseRepo _nurseRepo;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         #endregion
 
         #region ctor
-        public DoctorService(INurseRepo nurseRepo, IEmailService emailService, IDoctorRepo docRepo, IValidationService validationService)
+        public DoctorService(INurseRepo nurseRepo, IEmailService emailService, IHttpContextAccessor httpContextAccessor, IDoctorRepo docRepo, IValidationService validationService)
         {
             _emailService = emailService;
             _docRepo = docRepo;
             _nurseRepo = nurseRepo;
+            _httpContextAccessor= httpContextAccessor;
         }
         #endregion
 
-        public async Task<ResponseDTO> getDoctorAppointments(int doctorId)
+        #region Get Appointments
+        public async Task<ResponseDTO> getDoctorAppointments()
         {
             try
             {
+                var userIdClaim = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id");
+                int doctorId = 0;
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int result))
+                {
+                    doctorId =result;
+                }
                 var doctorAppointments = await _docRepo.checkAppointments(doctorId);
                 if(doctorAppointments == null)
                 {
@@ -39,11 +47,19 @@ namespace Service.Service
                 return new ResponseDTO { Status = 400, Message = ex.Message };
             }
         }
+        #endregion
 
-        public async Task<ResponseDTO> rescheduleAppointment(RescheduleAppoDTO rescheduleAppoDTO, int doctorId)
+        #region Reschedule Appointment
+        public async Task<ResponseDTO> rescheduleAppointment(RescheduleAppoDTO rescheduleAppoDTO)
         {
             try
             {
+                var userIdClaim = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id");
+                int doctorId = 0;
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int result))
+                {
+                    doctorId = result;
+                }
                 var isAppoExists = await _docRepo.isAppointmentExists(rescheduleAppoDTO.AppointmentId, doctorId);
                 if (!isAppoExists)
                 {
@@ -76,11 +92,19 @@ namespace Service.Service
                 return new ResponseDTO { Status = 400, Message = ex.Message };
             }
         }
+        #endregion
 
-        public async Task<ResponseDTO> cancelAppointment(int appointmentId, int doctorId)
+        #region Cancel Appointment
+        public async Task<ResponseDTO> cancelAppointment(int appointmentId)
         {
             try
             {
+                var userIdClaim = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id");
+                int doctorId = 0;
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int result))
+                {
+                    doctorId = result;
+                }
                 var isAppoExists = await _docRepo.isAppointmentExists(appointmentId, doctorId);
                 if (!isAppoExists)
                 {
@@ -100,10 +124,19 @@ namespace Service.Service
             }
             catch (Exception ex) { return new ResponseDTO { Status = 400, Message = ex.Message }; }
         }
-        public async Task<ResponseDTO> assignNurse(AssignNurseDTO assignNurseDTO, int doctorId)
+        #endregion
+
+        #region Assign Nurse
+        public async Task<ResponseDTO> assignNurse(AssignNurseDTO assignNurseDTO)
         {
             try
             {
+                var userIdClaim = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id");
+                int doctorId = 0;
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int res))
+                {
+                    doctorId = res;
+                }
                 // Check if the appointment exists and is assigned to the doctor
                 var appointmentExists = await _docRepo.isAppointmentExists(assignNurseDTO.AppointmentId, doctorId);
                 if (!appointmentExists)
@@ -149,8 +182,7 @@ namespace Service.Service
                 return new ResponseDTO { Status = 400, Message = ex.Message };
             }
         }
-
-
+        #endregion
 
     }
 }

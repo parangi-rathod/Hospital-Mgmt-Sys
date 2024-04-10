@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Repository.Model
 {
-   
+
     public class SpecialistDoctor
     {
         [Key]

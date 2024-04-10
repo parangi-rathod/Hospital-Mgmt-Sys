@@ -12,7 +12,7 @@ namespace HospitalMgmtSys.Controllers
         #region props
 
         private readonly IPatientService _patientService;
-        private readonly AccessToken _accToken;
+       
 
         #endregion
 
@@ -25,28 +25,14 @@ namespace HospitalMgmtSys.Controllers
 
         [HttpGet("Dashboard/CurrentAppointment")]
         public async Task<IActionResult> GetCurrentAppointment()
-        {
-            var patientId = User.Claims.FirstOrDefault(u => u.Type == "Id");
-            int idUser = 0;
-
-            if (patientId != null && int.TryParse(patientId.Value, out int id))
-            {
-                idUser = id;
-            }
-            var response = await _patientService.getCurrentAppointment(idUser);
+        {           
+            var response = await _patientService.getCurrentAppointment();
             return Ok(response);
         }
         [HttpGet("Dashboard/AppointmentHistory")]
         public async Task<IActionResult> AppointmentHistory()
-        {
-            var patientId = User.Claims.FirstOrDefault(u => u.Type == "Id");
-            int idUser = 0;
-
-            if (patientId != null && int.TryParse(patientId.Value, out int id))
-            {
-                idUser = id;
-            }
-            var response = await _patientService.appointmentHistory(idUser);
+        {           
+            var response = await _patientService.appointmentHistory();
             return Ok(response);
         }
     }

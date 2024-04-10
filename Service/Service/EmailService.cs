@@ -8,12 +8,18 @@ namespace Service.Service
 {
     public class EmailService : IEmailService
     {
+        #region props
         private readonly IConfiguration _config;
+        #endregion
 
+        #region ctor
         public EmailService(IConfiguration config)
         {
             _config = config;
         }
+        #endregion
+
+        #region send mail
         public void SendEmail(EmailDTO emailDTO)
         {
             string smtpClient = _config["EmailService:smtpClient"];
@@ -38,5 +44,6 @@ namespace Service.Service
                 }
             }
         }
+        #endregion
     }
 }

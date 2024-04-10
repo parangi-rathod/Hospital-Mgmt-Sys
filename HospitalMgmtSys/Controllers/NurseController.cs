@@ -32,7 +32,7 @@ namespace HospitalMgmtSys.Controllers
             {
                 idUser = id;
             }
-            var response = await _nurseService.checkDuties(idUser);
+            var response = await _nurseService.checkDuties();
             return Ok(response);
         }
     }

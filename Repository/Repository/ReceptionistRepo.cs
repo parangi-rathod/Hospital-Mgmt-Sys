@@ -17,6 +17,7 @@ namespace Repository.Repository
         }
         #endregion
 
+        #region schedule appointment
         public async Task<bool> ScheduleAppointment(Appointment appointment)
         {
             try
@@ -31,7 +32,7 @@ namespace Repository.Repository
                 return false; 
             }
         }
-
+        #endregion
 
     }
 }

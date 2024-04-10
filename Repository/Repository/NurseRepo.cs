@@ -18,12 +18,15 @@ namespace Repository.Repository
 
         #endregion
 
+        #region nurse exists
         public async Task<string> isNurseExists(int nurseId)
         {
             var isExists = await _context.Users.FirstOrDefaultAsync(u=>u.Id.Equals(nurseId) && u.Role.Equals(RoleType.Nurse));
             return isExists.Email;
         }
+        #endregion
 
+        #region nurse duties
         public async Task<List<dynamic>> nurseDuties(int nurseId)
         {
             var appointments = await _context.Appointments
@@ -45,7 +48,7 @@ namespace Repository.Repository
 
             return appointments.Cast<dynamic>().ToList();
         }
-
+        #endregion
 
     }
 }

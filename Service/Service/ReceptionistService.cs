@@ -8,7 +8,7 @@ namespace Service.Service
 {
     public class ReceptionistService : IReceptionistService
     {
-        #region properties
+        #region props
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
         private readonly IAuthRepo _authRepo;
@@ -36,6 +36,8 @@ namespace Service.Service
         }
 
         #endregion
+
+        #region register patient
         public async Task<ResponseDTO> RegisterPatient(RegisterPatientDTO registerPatientDTO)
         {
             try
@@ -43,7 +45,8 @@ namespace Service.Service
                 var validationResult = await _validationService.ValidatePatient(registerPatientDTO);
                 if (validationResult.IsValid)
                 {
-                    if (await _userRepo.UserExistsByEmail(registerPatientDTO.Email) )
+                    var patient = await _patientRepo.IsPatientExists(registerPatientDTO.FirstName, registerPatientDTO.DateOfBirth, registerPatientDTO.Email);
+                    if (patient!=null)
                     {
                         return new ResponseDTO { Status = 400, Message = "Patient already exists." };
                     }
@@ -84,7 +87,9 @@ namespace Service.Service
                 return new ResponseDTO { Error = ex.Message };
             }
         }
+        #endregion
 
+        #region schedule appointment
         public async Task<ResponseDTO> ScheduleAppointment(AppointmentDTO appointmentDTO)
         {
             try
@@ -107,21 +112,11 @@ namespace Service.Service
                     return new ResponseDTO { Status = 400, Message = "Patient does not exist; please register first." };
                 }
 
-                //var doctor = await _docRepo.doctorBySpecialization(appointmentDTO.DoctorId);
-
-                //if (doctor != null)
-                //{
-                //    appointmentDTO.DoctorId = doctor.Id;
-                //}
-
                 var doctor = await _userRepo.UserById(appointmentDTO.ConsultDoctorId);
 
                 var doctorSpec = await _docRepo.doctorBySpecialization(appointmentDTO.ConsultDoctorId);
 
-                //appointmentDTO.ScheduleStartTime = DateTime.Now;
-                //appointmentDTO.ScheduleEndTime = DateTime.Now.AddHours(3);
-
-                var isDoctorAvail = await _docRepo.checkAvailability(appointmentDTO.ConsultDoctorId, appointmentDTO.ScheduleStartTime);
+                var isDoctorAvail = await _docRepo.checkAvailability(appointmentDTO.ConsultDoctorId, appointmentDTO.ScheduleStartTime, appointmentDTO.ScheduleEndTime);
                 if (!isDoctorAvail)
                 {
                     return new ResponseDTO { Status = 400, Message = "Doctor is not available at given time" };
@@ -163,5 +158,6 @@ namespace Service.Service
                 return new ResponseDTO { Error = ex.Message };
             }
         }
+        #endregion
     }
 }
