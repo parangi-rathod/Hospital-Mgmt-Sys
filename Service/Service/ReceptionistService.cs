@@ -74,8 +74,14 @@ namespace Service.Service
                            "</body></html>"
                     };
 
-                    _emailService.SendEmail(emailDTO);
+                    if (!(_emailService.SendEmail(emailDTO)))
+                    {
+                        _authRepo.Remove(user);
+                        return new ResponseDTO { Status = 200, Message = "Error in registering patient, please try again later" };
+
+                    }
                     return new ResponseDTO { Status = 200, Message = "Patient registered successfully." };
+                    
                 }
                 else
                 {

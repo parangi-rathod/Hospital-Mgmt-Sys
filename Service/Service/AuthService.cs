@@ -33,7 +33,7 @@ namespace Service.Service
 
         #endregion
 
-        #region register user(nurse,receptionist
+        #region register user(nurse,receptionist)
         public async Task<ResponseDTO> RegisterUser(RegisterUserDTO registerUserDTO)
         {
             try

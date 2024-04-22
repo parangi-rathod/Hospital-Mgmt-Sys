@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.DTO;
 using Service.Interface;
-using Service.Service;
-using System.Runtime.CompilerServices;
-using System.Security.Claims;
 
 namespace HospitalMgmtSys.Controllers
 {
@@ -52,7 +49,5 @@ namespace HospitalMgmtSys.Controllers
             var response = await _doctorService.assignNurse(assignNurseDTO);
             return Ok(response);
         }
-      
-        
     }
 }

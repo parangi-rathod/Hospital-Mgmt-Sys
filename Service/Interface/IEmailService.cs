@@ -4,6 +4,6 @@ namespace Service.Interface
 {
     public interface IEmailService
     {
-        void SendEmail(EmailDTO emailDTO);
+        bool SendEmail(EmailDTO emailDTO);
     }
 }

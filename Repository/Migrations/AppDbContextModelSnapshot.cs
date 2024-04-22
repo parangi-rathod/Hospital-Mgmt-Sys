@@ -41,6 +41,11 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description1")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<int?>("NurseId")
                         .HasColumnType("int");
 
@@ -169,12 +174,13 @@ namespace Repository.Migrations
             modelBuilder.Entity("Repository.Model.Appointment", b =>
                 {
                     b.HasOne("Repository.Model.Users", "ConsultDoctor")
-                        .WithMany("Doctor")
+                        .WithMany()
                         .HasForeignKey("ConsultDoctorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Repository.Model.Users", "Nurse")
-                        .WithMany("Nurse")
+                        .WithMany()
                         .HasForeignKey("NurseId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -200,13 +206,6 @@ namespace Repository.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Repository.Model.Users", b =>
-                {
-                    b.Navigation("Doctor");
-
-                    b.Navigation("Nurse");
                 });
 #pragma warning restore 612, 618
         }

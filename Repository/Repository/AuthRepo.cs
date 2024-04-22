@@ -50,8 +50,15 @@ namespace Repository.Repository
                 return user;
             }
             return null;
-        } 
+        }
         #endregion
+
+        public async Task<Users> Remove(Users user)
+        {
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
 
     }
 }

@@ -26,6 +26,8 @@ namespace Repository.Model
         public string PatientProblem { get; set; }
 
         public string Description { get; set; }
+        [MaxLength(50)]
+        public string Description1 { get; set; }
 
         [Required]
         public string AppointmentStatus { get; set; }

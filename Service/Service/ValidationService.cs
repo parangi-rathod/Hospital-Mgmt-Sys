@@ -18,7 +18,10 @@ namespace Service.Service
                 { dto => !string.IsNullOrWhiteSpace(dto.Address), "Invalid address"},
                 { dto => !string.IsNullOrWhiteSpace(dto.Gender) && ValidGender(dto.Gender), "Gender must be male, female or other"},
                 { dto => string.IsNullOrWhiteSpace(dto.Pincode) || Regex.IsMatch(dto.Pincode, @"^\d{6}$"), "Pincode must be lenght of 6 numbers"},
-                {dto => ValidateRole(dto.Role),"Role must be Nurse or Receptionist" }
+                { dto=> dto.DateOfBirth<DateTime.Today, "Date of Birth should be less than today's date"},
+                { dto => dto.DateOfBirth.Month <= 12, "Invalid month" },
+                { dto => dto.DateOfBirth.Day <= DateTime.DaysInMonth(dto.DateOfBirth.Year, dto.DateOfBirth.Month), "Invalid day" },
+                { dto => ValidateRole(dto.Role),"Role must be Nurse or Receptionist" }
             };
 
             return await ValidateDTO(registerDTO, validationRules);

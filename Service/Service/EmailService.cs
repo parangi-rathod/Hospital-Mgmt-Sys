@@ -20,28 +20,36 @@ namespace Service.Service
         #endregion
 
         #region send mail
-        public void SendEmail(EmailDTO emailDTO)
+        public bool SendEmail(EmailDTO emailDTO)
         {
             string smtpClient = _config["EmailService:smtpClient"];
             int smtpPort = int.Parse(_config["EmailService:smptpPort"]);
             string emailFrom = _config["EmailService:emailFrom"];
             string emailPass = _config["EmailService:emailPass"];
 
-            using (SmtpClient client = new SmtpClient(smtpClient, smtpPort))
+            try
             {
-                client.EnableSsl = true;
-                client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(emailFrom, emailPass);
-
-                using (MailMessage mailMessage = new MailMessage())
+                using (SmtpClient client = new SmtpClient(smtpClient, smtpPort))
                 {
-                    mailMessage.From = new MailAddress(emailFrom);
-                    mailMessage.To.Add(emailDTO.Email);
-                    mailMessage.Subject = emailDTO.Subject;
-                    mailMessage.IsBodyHtml = true;
-                    mailMessage.Body = emailDTO.Body;
-                    client.Send(mailMessage);
+                    client.EnableSsl = true;
+                    client.UseDefaultCredentials = false;
+                    client.Credentials = new NetworkCredential(emailFrom, emailPass);
+
+                    using (MailMessage mailMessage = new MailMessage())
+                    {
+                        mailMessage.From = new MailAddress(emailFrom);
+                        mailMessage.To.Add(emailDTO.Email);
+                        mailMessage.Subject = emailDTO.Subject;
+                        mailMessage.IsBodyHtml = true;
+                        mailMessage.Body = emailDTO.Body;
+                        client.Send(mailMessage);
+                    }
+                    return true;
                 }
+            }
+            catch(Exception ex)
+            {
+                return false;
             }
         }
         #endregion
